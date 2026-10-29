@@ -4,143 +4,760 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1728">
     <title>MedVision-CI | Chest X-Ray Analysis</title>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f7fb;
-            color: #1f2937;
-            margin: 0;
-            padding: 30px 16px;
+        :root {
+            --navy: #0b1728;
+            --navy-light: #13253d;
+            --teal: #24c8b0;
+            --teal-dark: #087f73;
+            --text: #17263b;
+            --muted: #718096;
+            --surface: #ffffff;
+            --border: #e4ebf2;
+            --background: #f3f7fb;
         }
 
-        .container {
-            max-width: 650px;
-            margin: 30px auto;
-            padding: 30px;
-            background: white;
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse at 10% 0%, #dcefeb 0, transparent 35%),
+                var(--background);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: var(--navy);
+            color: white;
+            padding: 17px 6%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-weight: 750;
+            letter-spacing: .2px;
+        }
+
+        .brand-icon {
+            width: 39px;
+            height: 39px;
+            display: grid;
+            place-items: center;
+            background: rgba(36, 200, 176, .13);
+            border: 1px solid rgba(36, 200, 176, .35);
+            color: var(--teal);
             border-radius: 12px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+            font-size: 23px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #c4d4e6;
+            border: 1px solid #31435a;
+            border-radius: 30px;
+            padding: 8px 12px;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--teal);
+            border-radius: 50%;
+        }
+
+        .hero {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 48px 24px 25px;
+        }
+
+        .eyebrow {
+            color: var(--teal-dark);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 11px;
+            font-weight: 800;
         }
 
         h1 {
-            color: #174ea6;
-            margin-bottom: 8px;
+            margin: 12px 0;
+            color: var(--navy);
+            font-size: clamp(30px, 4vw, 43px);
+            line-height: 1.15;
+            letter-spacing: -1.4px;
         }
 
-        .subtitle {
-            color: #64748b;
-            margin-bottom: 24px;
+        .hero p {
+            color: var(--muted);
+            line-height: 1.7;
+            max-width: 610px;
+            margin: 0;
         }
 
-        input, button {
-            font-size: 16px;
-            margin-top: 12px;
+        .layout {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 12px 24px 50px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 22px;
+            align-items: start;
         }
 
-        input[type="file"] {
-            display: block;
-            max-width: 100%;
-            margin-bottom: 18px;
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 19px;
+            padding: 25px;
+            box-shadow: 0 10px 35px rgba(22, 42, 68, .045);
+            min-width: 0;
         }
 
-        button {
-            background: #174ea6;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            cursor: pointer;
+        .card-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 7px;
         }
 
-        button:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
+        h2 {
+            margin: 0;
+            color: var(--navy);
+            font-size: 18px;
         }
 
-        #result {
-            margin-top: 24px;
-            padding: 16px;
+        .step {
+            color: var(--teal-dark);
+            background: #e6f8f5;
+            padding: 6px 10px;
             border-radius: 8px;
-            background: #f8fafc;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .dropzone {
+            position: relative;
+            margin-top: 22px;
+            min-height: 235px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 1.5px dashed #b8cbd8;
+            border-radius: 15px;
+            background: #f8fbfd;
+            cursor: pointer;
+            transition: border-color .2s, background .2s, transform .2s;
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--teal-dark);
+            background: #effbf8;
+        }
+
+        .dropzone.dragover { transform: scale(1.01); }
+
+        .upload-icon {
+            width: 53px;
+            height: 53px;
+            display: grid;
+            place-items: center;
+            border-radius: 16px;
+            background: #e3f7f3;
+            color: var(--teal-dark);
+            font-size: 26px;
+            margin-bottom: 13px;
+        }
+
+        .drop-title {
+            font-weight: 750;
+            font-size: 15px;
+        }
+
+        .browse {
+            color: var(--teal-dark);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .file-info {
+            margin-top: 13px;
+            font-size: 12px;
+            color: var(--muted);
             overflow-wrap: anywhere;
         }
 
-        .prediction {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 12px;
+        #image {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
         }
+
+        .preview {
+            display: none;
+            width: 100%;
+            max-height: 260px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin-top: 15px;
+            background: #e9eef3;
+        }
+
+        .preview.visible { display: block; }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+            transition: background .2s, transform .2s;
+        }
+
+        .analyze {
+            flex: 1;
+            border: 0;
+            border-radius: 11px;
+            padding: 14px 18px;
+            background: var(--navy);
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .analyze:hover:not(:disabled) {
+            background: #1b3859;
+            transform: translateY(-1px);
+        }
+
+        .analyze:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+        .clear {
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 12px 15px;
+            background: white;
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .clear:hover { background: #f3f7fb; }
+
+        .result-panel {
+            margin-top: 20px;
+            min-height: 260px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: #fbfdff;
+            padding: 19px;
+            overflow-wrap: anywhere;
+        }
+
+        .result-placeholder {
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .result-symbol {
+            width: 52px;
+            height: 52px;
+            display: grid;
+            place-items: center;
+            border-radius: 16px;
+            background: #eaf1f7;
+            font-size: 25px;
+        }
+
+        .result-placeholder strong { color: #3b4e64; }
+
+        .result-placeholder span {
+            max-width: 250px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .result-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .result-label {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 800;
+        }
+
+        .result-badge {
+            padding: 7px 11px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 800;
+            background: #e5f7f2;
+            color: #087f67;
+        }
+
+        .result-badge.pneumonia {
+            background: #fff0df;
+            color: #a95412;
+        }
+
+        .prediction {
+            margin: 15px 0 5px;
+            font-size: 27px;
+            font-weight: 800;
+            color: var(--navy);
+            letter-spacing: -.5px;
+        }
+
+        .confidence {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
+
+        .prob-title {
+            font-size: 12px;
+            color: #52657b;
+            font-weight: 750;
+            margin-bottom: 15px;
+        }
+
+        .probability { margin-bottom: 15px; }
+
+        .prob-label {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 7px;
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .track {
+            height: 8px;
+            background: #e8eef4;
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+        .bar {
+            width: 0;
+            height: 100%;
+            border-radius: 30px;
+            background: var(--teal-dark);
+            transition: width .7s ease;
+        }
+
+        .bar.pneumonia { background: #df9345; }
+
+        .result-message {
+            margin-top: 18px;
+            color: #52657b;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .error {
+            color: #a72d2d;
+            background: #fff3f3;
+            border: 1px solid #ffd8d8;
+            border-radius: 10px;
+            padding: 13px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 220px;
+            justify-content: center;
+            color: #52657b;
+            font-size: 13px;
+        }
+
+        .spinner {
+            width: 23px;
+            height: 23px;
+            border: 3px solid #d9e9e6;
+            border-top-color: var(--teal-dark);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .disclaimer {
-            margin-top: 24px;
-            padding: 12px;
-            border-left: 4px solid #d97706;
-            background: #fffbeb;
-            font-size: 14px;
+            max-width: 1052px;
+            margin: 0 auto 35px;
+            padding: 15px 18px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            border: 1px solid #f1dfb8;
+            border-radius: 12px;
+            background: #fffaf0;
+            color: #785b27;
+            font-size: 12px;
+            line-height: 1.7;
         }
 
-        .hidden {
-            display: none;
+        .disclaimer strong { color: #69470c; }
+
+        footer {
+            padding: 19px 24px;
+            background: var(--navy);
+            color: #9db0c6;
+            text-align: center;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        :focus-visible {
+            outline: 3px solid #24c8b0;
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 760px) {
+            .layout { grid-template-columns: 1fr; padding-inline: 16px; }
+            .hero { padding: 35px 18px 20px; }
+            .card { padding: 20px; }
+            .topbar { padding-inline: 18px; }
+            .disclaimer { margin-inline: 16px; }
+            .status { font-size: 10px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+            }
         }
     </style>
 </head>
 
 <body>
-    <main class="container">
-        <h1>MedVision-CI</h1>
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-icon" aria-hidden="true">✳</div>
+            <span>MedVision-CI</span>
+        </div>
+        <div class="status">
+            <span class="status-dot" aria-hidden="true"></span>
+            AI classification prototype
+        </div>
+    </header>
 
-        <p class="subtitle">
-            AI-powered chest X-ray classification prototype
+    <section class="hero">
+        <div class="eyebrow">Medical imaging · AI research</div>
+        <h1>Chest X-Ray Analysis</h1>
+        <p>
+            Explore an AI-powered image classification prototype.
+            Upload a chest X-ray to view its predicted class and
+            the model's estimated class probabilities.
         </p>
+    </section>
 
-        <form id="upload-form">
-            <label for="image">Select a chest X-ray image (PNG or JPEG):</label>
-            <input
-                type="file"
-                id="image"
-                name="image"
-                accept=".png,.jpg,.jpeg"
-                required
-            >
+    <main class="layout">
+        <section class="card">
+            <div class="card-heading">
+                <h2>Upload an image</h2>
+                <span class="step">STEP 01</span>
+            </div>
+            <p class="muted">
+                Choose a PNG or JPEG chest X-ray image to begin analysis.
+            </p>
 
-            <button type="submit" id="submit-button">
-                Analyze Image
-            </button>
-        </form>
+            <form id="upload-form">
+                <label class="dropzone" id="dropzone" for="image">
+                    <span class="upload-icon" aria-hidden="true">↑</span>
+                    <span class="drop-title">Drop your image here</span>
+                    <span class="muted">or <span class="browse">browse files</span></span>
+                    <span class="file-info" id="file-info">PNG or JPEG · Maximum 10 MB</span>
+                    <input
+                        type="file"
+                        id="image"
+                        name="image"
+                        accept=".png,.jpg,.jpeg,image/png,image/jpeg"
+                        required
+                    >
+                </label>
 
-        <section id="result" aria-live="polite">
-            Select an image to begin.
+                <img id="preview" class="preview" alt="Selected X-ray preview">
+
+                <div class="button-row">
+                    <button type="submit" id="submit-button" class="analyze">
+                        Analyze Image →
+                    </button>
+                    <button type="button" id="clear-button" class="clear">
+                        Clear
+                    </button>
+                </div>
+            </form>
         </section>
 
-        <div class="disclaimer">
-            <strong>Important:</strong> This is an educational prototype,
-            not a medical diagnostic tool. Predictions may be incorrect.
-            Do not use the results to make medical decisions.
-        </div>
+        <section class="card">
+            <div class="card-heading">
+                <h2>Analysis results</h2>
+                <span class="step">STEP 02</span>
+            </div>
+            <p class="muted">
+                Your model output and class probability estimates will appear here.
+            </p>
+
+            <section id="result" class="result-panel" aria-live="polite" aria-busy="false">
+                <div class="result-placeholder">
+                    <div class="result-symbol" aria-hidden="true">⌁</div>
+                    <strong>Ready for analysis</strong>
+                    <span>Select an image and click Analyze Image to see the model output.</span>
+                </div>
+            </section>
+        </section>
     </main>
+
+    <aside class="disclaimer">
+        <span aria-hidden="true">⚠</span>
+        <div>
+            <strong>Research prototype — not for clinical use.</strong>
+            This educational project may produce incorrect predictions.
+            Model confidence is not a measure of clinical certainty.
+            Do not use these results to diagnose, treat, or make medical decisions.
+        </div>
+    </aside>
+
+    <footer>
+        MedVision-CI · AI-powered chest X-ray classification prototype<br>
+        Built for educational and software engineering demonstration purposes.
+    </footer>
 
     <script>
         const form = document.getElementById("upload-form");
         const resultBox = document.getElementById("result");
         const submitButton = document.getElementById("submit-button");
+        const fileInput = document.getElementById("image");
+        const fileInfo = document.getElementById("file-info");
+        const preview = document.getElementById("preview");
+        const dropzone = document.getElementById("dropzone");
+        const clearButton = document.getElementById("clear-button");
 
-        form.addEventListener("submit", async (event) => {
+        let previewUrl = null;
+
+        function showPlaceholder(message = "Select an image and click Analyze Image to see the model output.") {
+            resultBox.setAttribute("aria-busy", "false");
+            resultBox.replaceChildren();
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "result-placeholder";
+
+            const symbol = document.createElement("div");
+            symbol.className = "result-symbol";
+            symbol.setAttribute("aria-hidden", "true");
+            symbol.textContent = "⌁";
+
+            const heading = document.createElement("strong");
+            heading.textContent = "Ready for analysis";
+
+            const description = document.createElement("span");
+            description.textContent = message;
+
+            wrapper.append(symbol, heading, description);
+            resultBox.appendChild(wrapper);
+        }
+
+        function showError(message) {
+            resultBox.setAttribute("aria-busy", "false");
+            resultBox.replaceChildren();
+
+            const error = document.createElement("div");
+            error.className = "error";
+            error.textContent = message;
+            resultBox.appendChild(error);
+        }
+
+        function selectFile(file) {
+            if (!file) return;
+
+            const validType = ["image/png", "image/jpeg"].includes(file.type);
+            const validExtension = /\.(png|jpe?g)$/i.test(file.name);
+
+            if (!validType || !validExtension) {
+                fileInput.value = "";
+                resetPreview();
+                showError("Please select a valid PNG or JPEG image.");
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                fileInput.value = "";
+                resetPreview();
+                showError("The image exceeds the 10 MB upload limit.");
+                return;
+            }
+
+            fileInfo.textContent = `${file.name} · ${(file.size / 1024).toFixed(1)} KB`;
+
+            resetPreview();
+            previewUrl = URL.createObjectURL(file);
+            preview.src = previewUrl;
+            preview.classList.add("visible");
+            showPlaceholder("Image selected. Click Analyze Image to run the model.");
+        }
+
+        function resetPreview() {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+            preview.removeAttribute("src");
+            preview.classList.remove("visible");
+            fileInfo.textContent = "PNG or JPEG · Maximum 10 MB";
+        }
+
+        fileInput.addEventListener("change", () => {
+            selectFile(fileInput.files[0]);
+        });
+
+        for (const eventName of ["dragenter", "dragover"]) {
+            dropzone.addEventListener(eventName, event => {
+                event.preventDefault();
+                dropzone.classList.add("dragover");
+            });
+        }
+
+        for (const eventName of ["dragleave", "drop"]) {
+            dropzone.addEventListener(eventName, event => {
+                event.preventDefault();
+                dropzone.classList.remove("dragover");
+            });
+        }
+
+        dropzone.addEventListener("drop", event => {
+            const file = event.dataTransfer.files[0];
+            if (!file) return;
+
+            const transfer = new DataTransfer();
+            transfer.items.add(file);
+            fileInput.files = transfer.files;
+            selectFile(file);
+        });
+
+        clearButton.addEventListener("click", () => {
+            fileInput.value = "";
+            resetPreview();
+            showPlaceholder();
+        });
+
+        function addProbability(label, probability) {
+            const value = Number(probability);
+
+            if (!Number.isFinite(value)) return;
+
+            const percentage = Math.max(0, Math.min(100, value * 100));
+            const item = document.createElement("div");
+            item.className = "probability";
+
+            const labels = document.createElement("div");
+            labels.className = "prob-label";
+
+            const name = document.createElement("span");
+            name.textContent = label;
+
+            const amount = document.createElement("span");
+            amount.textContent = `${percentage.toFixed(2)}%`;
+
+            const track = document.createElement("div");
+            track.className = "track";
+            track.setAttribute("role", "progressbar");
+            track.setAttribute("aria-label", `${label} probability`);
+            track.setAttribute("aria-valuemin", "0");
+            track.setAttribute("aria-valuemax", "100");
+            track.setAttribute("aria-valuenow", percentage.toFixed(2));
+
+            const bar = document.createElement("div");
+            bar.className = "bar";
+            if (label.toUpperCase() === "PNEUMONIA") {
+                bar.classList.add("pneumonia");
+            }
+            bar.style.width = `${percentage}%`;
+
+            labels.append(name, amount);
+            track.appendChild(bar);
+            item.append(labels, track);
+            resultBox.appendChild(item);
+        }
+
+        form.addEventListener("submit", async event => {
             event.preventDefault();
 
-            const fileInput = document.getElementById("image");
+            const file = fileInput.files[0];
 
-            if (!fileInput.files.length) {
-                resultBox.textContent = "Please select an image.";
+            if (!file) {
+                showError("Please select an image before analyzing.");
                 return;
             }
 
             const formData = new FormData();
-            formData.append("image", fileInput.files[0]);
+            formData.append("image", file);
 
-            resultBox.textContent = "Analyzing image...";
+            resultBox.setAttribute("aria-busy", "true");
+            resultBox.replaceChildren();
+
+            const loading = document.createElement("div");
+            loading.className = "loading";
+
+            const spinner = document.createElement("div");
+            spinner.className = "spinner";
+            spinner.setAttribute("aria-hidden", "true");
+
+            const loadingText = document.createElement("span");
+            loadingText.textContent = "Analyzing image with the model...";
+
+            loading.append(spinner, loadingText);
+            resultBox.appendChild(loading);
             submitButton.disabled = true;
+            submitButton.textContent = "Analyzing...";
 
             try {
                 const response = await fetch("/upload", {
@@ -151,46 +768,60 @@
                 const data = await response.json();
 
                 if (!response.ok) {
-                    resultBox.textContent =
-                        data.error || "Image analysis failed.";
+                    showError(data.error || "Image analysis failed. Please try again.");
                     return;
                 }
 
+                resultBox.setAttribute("aria-busy", "false");
                 resultBox.replaceChildren();
+
+                const top = document.createElement("div");
+                top.className = "result-top";
+
+                const label = document.createElement("span");
+                label.className = "result-label";
+                label.textContent = "Model prediction";
+
+                const badge = document.createElement("span");
+                badge.className = "result-badge";
+                badge.textContent = "Analysis complete";
+
+                if (String(data.prediction).toUpperCase() === "PNEUMONIA") {
+                    badge.classList.add("pneumonia");
+                }
+
+                top.append(label, badge);
 
                 const heading = document.createElement("div");
                 heading.className = "prediction";
                 heading.textContent = "Prediction: " + data.prediction;
-                resultBox.appendChild(heading);
 
-                const confidence = document.createElement("p");
+                const confidence = document.createElement("div");
+                confidence.className = "confidence";
                 confidence.textContent =
-                    "Confidence: " +
-                    (data.confidence * 100).toFixed(2) + "%";
-                resultBox.appendChild(confidence);
+                    "Model confidence: " + (Number(data.confidence) * 100).toFixed(2) + "%";
 
-                const probabilityHeading = document.createElement("p");
-                probabilityHeading.textContent = "Class probabilities:";
-                resultBox.appendChild(probabilityHeading);
+                const probabilityHeading = document.createElement("div");
+                probabilityHeading.className = "prob-title";
+                probabilityHeading.textContent = "CLASS PROBABILITIES";
 
-                for (const [label, probability] of
-                    Object.entries(data.probabilities)) {
-                    const item = document.createElement("p");
-                    item.textContent =
-                        label + ": " +
-                        (probability * 100).toFixed(2) + "%";
-                    resultBox.appendChild(item);
+                resultBox.append(top, heading, confidence, probabilityHeading);
+
+                for (const [label, probability] of Object.entries(data.probabilities || {})) {
+                    addProbability(label, probability);
                 }
 
                 const message = document.createElement("p");
-                message.textContent = data.message;
+                message.className = "result-message";
+                message.textContent = data.message || "Image classified successfully.";
                 resultBox.appendChild(message);
 
             } catch (error) {
-                resultBox.textContent =
-                    "Unable to contact the server. Please try again.";
+                showError("Unable to contact the server. Please check that the application is running and try again.");
             } finally {
                 submitButton.disabled = false;
+                submitButton.textContent = "Analyze Image →";
+                resultBox.setAttribute("aria-busy", "false");
             }
         });
     </script>

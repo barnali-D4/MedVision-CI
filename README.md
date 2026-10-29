@@ -8,7 +8,7 @@
 
 **Repository:** [MedVision-CI @ GitHub](https://github.com/barnali-D4/MedVision-CI)
 
-![Output](docs/images/Output.png)
+![Output](docs/images/MedVision-CI_webpage.png)
 
 ---
 
