@@ -5,29 +5,36 @@ pipeline {
     stages {
         stage('Checkout Verified') {
             steps {
-                echo 'MedVision-CI source code has been retrieved from GitHub.'
+                echo 'Source code retrieved from GitHub.'
             }
         }
 
         stage('Verify Python') {
             steps {
                 bat 'python --version'
+                bat 'python -m pip --version'
             }
         }
 
-        stage('Project Structure') {
+        stage('Install Dependencies') {
             steps {
-                bat 'dir'
+                bat 'python -m pip install -r requirements.txt'
+            }
+        }
+
+        stage('Run Unit and API Tests') {
+            steps {
+                bat 'python -m pytest tests/unit tests/api -v'
             }
         }
     }
 
     post {
         success {
-            echo 'MedVision-CI pipeline completed successfully!'
+            echo 'MedVision-CI: automated tests passed!'
         }
         failure {
-            echo 'MedVision-CI pipeline failed. Check the console output.'
+            echo 'MedVision-CI: pipeline failed. Check the console output.'
         }
     }
 }
