@@ -39,6 +39,18 @@ pipeline {
                 bat 'docker build -t medvision-ci:jenkins .'
             }
         }
+
+        stage('Container Health Check') {
+            steps {
+                bat 'docker run -d --name medvision-ci-test -p 5001:5000 medvision-ci:jenkins'
+                bat 'python health_check.py'
+            }
+            post {
+                always {
+                    bat 'docker rm -f medvision-ci-test'
+                }
+            }
+        }
     }
 
     post {
