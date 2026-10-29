@@ -35,9 +35,10 @@ pipeline {
             }
         }
 
-        stage('Start Selenium Browser') {
+        stage('Run Selenium UI Tests') {
             steps {
                 bat 'docker rm -f medvision-selenium-jenkins 2>NUL || exit /b 0'
+
                 bat 'docker run -d --name medvision-selenium-jenkins -p 4444:4444 --shm-size="2g" selenium/standalone-chrome:latest'
 
                 powershell '''
@@ -62,17 +63,13 @@ pipeline {
 
                     throw "Selenium Chrome did not become ready."
                 '''
+
+                bat 'python -m pytest tests/selenium -v'
             }
             post {
                 always {
                     bat 'docker rm -f medvision-selenium-jenkins 2>NUL || exit /b 0'
                 }
-            }
-        }
-
-        stage('Run Selenium UI Tests') {
-            steps {
-                bat 'python -m pytest tests/selenium -v'
             }
         }
 
@@ -84,6 +81,7 @@ pipeline {
 
         stage('Container Health Check') {
             steps {
+                bat 'docker rm -f medvision-ci-test 2>NUL || exit /b 0'
                 bat 'docker run -d --name medvision-ci-test -p 5001:5000 medvision-ci:jenkins'
                 bat 'python health_check.py'
             }
@@ -101,6 +99,10 @@ pipeline {
         }
         failure {
             echo 'MedVision-CI: pipeline failed. Check the console output.'
+        }
+        always {
+            bat 'docker rm -f medvision-selenium-jenkins 2>NUL || exit /b 0'
+            bat 'docker rm -f medvision-ci-test 2>NUL || exit /b 0'
         }
     }
 }
