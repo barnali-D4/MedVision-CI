@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -13,6 +12,13 @@ pipeline {
             steps {
                 bat 'python --version'
                 bat 'python -m pip --version'
+            }
+        }
+
+        stage('Verify Docker') {
+            steps {
+                bat 'docker version'
+                bat 'docker ps'
             }
         }
 
