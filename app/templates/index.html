@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -463,7 +463,11 @@
         }
 
         @media (max-width: 760px) {
-            .layout { grid-template-columns: 1fr; padding-inline: 16px; }
+            .layout {
+                grid-template-columns: 1fr;
+                padding-inline: 16px;
+            }
+
             .hero { padding: 35px 18px 20px; }
             .card { padding: 20px; }
             .topbar { padding-inline: 18px; }
@@ -486,6 +490,7 @@
             <div class="brand-icon" aria-hidden="true">✳</div>
             <span>MedVision-CI</span>
         </div>
+
         <div class="status">
             <span class="status-dot" aria-hidden="true"></span>
             AI classification prototype
@@ -494,7 +499,7 @@
 
     <section class="hero">
         <div class="eyebrow">Medical imaging · AI research</div>
-        <h1>Chest X-Ray Analysis</h1>
+        <h1>MedVision-CI</h1>
         <p>
             Explore an AI-powered image classification prototype.
             Upload a chest X-ray to view its predicted class and
@@ -508,6 +513,7 @@
                 <h2>Upload an image</h2>
                 <span class="step">STEP 01</span>
             </div>
+
             <p class="muted">
                 Choose a PNG or JPEG chest X-ray image to begin analysis.
             </p>
@@ -518,6 +524,7 @@
                     <span class="drop-title">Drop your image here</span>
                     <span class="muted">or <span class="browse">browse files</span></span>
                     <span class="file-info" id="file-info">PNG or JPEG · Maximum 10 MB</span>
+
                     <input
                         type="file"
                         id="image"
@@ -533,6 +540,7 @@
                     <button type="submit" id="submit-button" class="analyze">
                         Analyze Image →
                     </button>
+
                     <button type="button" id="clear-button" class="clear">
                         Clear
                     </button>
@@ -545,11 +553,17 @@
                 <h2>Analysis results</h2>
                 <span class="step">STEP 02</span>
             </div>
+
             <p class="muted">
                 Your model output and class probability estimates will appear here.
             </p>
 
-            <section id="result" class="result-panel" aria-live="polite" aria-busy="false">
+            <section
+                id="result"
+                class="result-panel"
+                aria-live="polite"
+                aria-busy="false"
+            >
                 <div class="result-placeholder">
                     <div class="result-symbol" aria-hidden="true">⌁</div>
                     <strong>Ready for analysis</strong>
@@ -586,7 +600,9 @@
 
         let previewUrl = null;
 
-        function showPlaceholder(message = "Select an image and click Analyze Image to see the model output.") {
+        function showPlaceholder(
+            message = "Select an image and click Analyze Image to see the model output."
+        ) {
             resultBox.setAttribute("aria-busy", "false");
             resultBox.replaceChildren();
 
@@ -615,7 +631,19 @@
             const error = document.createElement("div");
             error.className = "error";
             error.textContent = message;
+
             resultBox.appendChild(error);
+        }
+
+        function resetPreview() {
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+            }
+
+            previewUrl = null;
+            preview.removeAttribute("src");
+            preview.classList.remove("visible");
+            fileInfo.textContent = "PNG or JPEG · Maximum 10 MB";
         }
 
         function selectFile(file) {
@@ -638,21 +666,18 @@
                 return;
             }
 
-            fileInfo.textContent = `${file.name} · ${(file.size / 1024).toFixed(1)} KB`;
+            fileInfo.textContent =
+                `${file.name} · ${(file.size / 1024).toFixed(1)} KB`;
 
             resetPreview();
+
             previewUrl = URL.createObjectURL(file);
             preview.src = previewUrl;
             preview.classList.add("visible");
-            showPlaceholder("Image selected. Click Analyze Image to run the model.");
-        }
 
-        function resetPreview() {
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
-            previewUrl = null;
-            preview.removeAttribute("src");
-            preview.classList.remove("visible");
-            fileInfo.textContent = "PNG or JPEG · Maximum 10 MB";
+            showPlaceholder(
+                "Image selected. Click Analyze Image to run the model."
+            );
         }
 
         fileInput.addEventListener("change", () => {
@@ -680,6 +705,7 @@
             const transfer = new DataTransfer();
             transfer.items.add(file);
             fileInput.files = transfer.files;
+
             selectFile(file);
         });
 
@@ -695,6 +721,7 @@
             if (!Number.isFinite(value)) return;
 
             const percentage = Math.max(0, Math.min(100, value * 100));
+
             const item = document.createElement("div");
             item.className = "probability";
 
@@ -717,14 +744,17 @@
 
             const bar = document.createElement("div");
             bar.className = "bar";
+
             if (label.toUpperCase() === "PNEUMONIA") {
                 bar.classList.add("pneumonia");
             }
+
             bar.style.width = `${percentage}%`;
 
             labels.append(name, amount);
             track.appendChild(bar);
             item.append(labels, track);
+
             resultBox.appendChild(item);
         }
 
@@ -756,6 +786,7 @@
 
             loading.append(spinner, loadingText);
             resultBox.appendChild(loading);
+
             submitButton.disabled = true;
             submitButton.textContent = "Analyzing...";
 
@@ -768,7 +799,9 @@
                 const data = await response.json();
 
                 if (!response.ok) {
-                    showError(data.error || "Image analysis failed. Please try again.");
+                    showError(
+                        data.error || "Image analysis failed. Please try again."
+                    );
                     return;
                 }
 
@@ -799,25 +832,39 @@
                 const confidence = document.createElement("div");
                 confidence.className = "confidence";
                 confidence.textContent =
-                    "Model confidence: " + (Number(data.confidence) * 100).toFixed(2) + "%";
+                    "Confidence: " +
+                    (Number(data.confidence) * 100).toFixed(2) + "%";
 
                 const probabilityHeading = document.createElement("div");
                 probabilityHeading.className = "prob-title";
-                probabilityHeading.textContent = "CLASS PROBABILITIES";
+                probabilityHeading.textContent = "Class probabilities:";
 
-                resultBox.append(top, heading, confidence, probabilityHeading);
+                resultBox.append(
+                    top,
+                    heading,
+                    confidence,
+                    probabilityHeading
+                );
 
-                for (const [label, probability] of Object.entries(data.probabilities || {})) {
+                for (
+                    const [label, probability]
+                    of Object.entries(data.probabilities || {})
+                ) {
                     addProbability(label, probability);
                 }
 
                 const message = document.createElement("p");
                 message.className = "result-message";
-                message.textContent = data.message || "Image classified successfully.";
+                message.textContent =
+                    data.message || "Image classified successfully.";
+
                 resultBox.appendChild(message);
 
             } catch (error) {
-                showError("Unable to contact the server. Please check that the application is running and try again.");
+                showError(
+                    "Unable to contact the server. Please check that the " +
+                    "application is running and try again."
+                );
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = "Analyze Image →";
@@ -827,3 +874,4 @@
     </script>
 </body>
 </html>
+```
