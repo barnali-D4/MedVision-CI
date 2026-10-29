@@ -5,12 +5,6 @@ pipeline {
     stages {
         stage('Checkout Verified') {
             steps {
-                echo 'Source code retrieved from GitHub.'
-            }
-        }
-
-        stage('Verify Python') {
-            steps {
                 bat 'python --version'
                 bat 'python -m pip --version'
             }
