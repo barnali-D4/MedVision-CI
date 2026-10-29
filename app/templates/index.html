@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedVision-CI | Chest X-Ray Analysis</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+            margin: 0;
+            padding: 30px 16px;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 30px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #174ea6;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+        input, button {
+            font-size: 16px;
+            margin-top: 12px;
+        }
+
+        input[type="file"] {
+            display: block;
+            max-width: 100%;
+            margin-bottom: 18px;
+        }
+
+        button {
+            background: #174ea6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        #result {
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: 8px;
+            background: #f8fafc;
+            overflow-wrap: anywhere;
+        }
+
+        .prediction {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .disclaimer {
+            margin-top: 24px;
+            padding: 12px;
+            border-left: 4px solid #d97706;
+            background: #fffbeb;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <h1>MedVision-CI</h1>
+
+        <p class="subtitle">
+            AI-powered chest X-ray classification prototype
+        </p>
+
+        <form id="upload-form">
+            <label for="image">Select a chest X-ray image (PNG or JPEG):</label>
+            <input
+                type="file"
+                id="image"
+                name="image"
+                accept=".png,.jpg,.jpeg"
+                required
+            >
+
+            <button type="submit" id="submit-button">
+                Analyze Image
+            </button>
+        </form>
+
+        <section id="result" aria-live="polite">
+            Select an image to begin.
+        </section>
+
+        <div class="disclaimer">
+            <strong>Important:</strong> This is an educational prototype,
+            not a medical diagnostic tool. Predictions may be incorrect.
+            Do not use the results to make medical decisions.
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById("upload-form");
+        const resultBox = document.getElementById("result");
+        const submitButton = document.getElementById("submit-button");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const fileInput = document.getElementById("image");
+
+            if (!fileInput.files.length) {
+                resultBox.textContent = "Please select an image.";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("image", fileInput.files[0]);
+
+            resultBox.textContent = "Analyzing image...";
+            submitButton.disabled = true;
+
+            try {
+                const response = await fetch("/upload", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    resultBox.textContent =
+                        data.error || "Image analysis failed.";
+                    return;
+                }
+
+                resultBox.replaceChildren();
+
+                const heading = document.createElement("div");
+                heading.className = "prediction";
+                heading.textContent = "Prediction: " + data.prediction;
+                resultBox.appendChild(heading);
+
+                const confidence = document.createElement("p");
+                confidence.textContent =
+                    "Confidence: " +
+                    (data.confidence * 100).toFixed(2) + "%";
+                resultBox.appendChild(confidence);
+
+                const probabilityHeading = document.createElement("p");
+                probabilityHeading.textContent = "Class probabilities:";
+                resultBox.appendChild(probabilityHeading);
+
+                for (const [label, probability] of
+                    Object.entries(data.probabilities)) {
+                    const item = document.createElement("p");
+                    item.textContent =
+                        label + ": " +
+                        (probability * 100).toFixed(2) + "%";
+                    resultBox.appendChild(item);
+                }
+
+                const message = document.createElement("p");
+                message.textContent = data.message;
+                resultBox.appendChild(message);
+
+            } catch (error) {
+                resultBox.textContent =
+                    "Unable to contact the server. Please try again.";
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

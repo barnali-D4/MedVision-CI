@@ -1,0 +1,23 @@
+
+# Python environment and caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+~ip*
+
+# Dataset files
+data/
+*.zip
+
+# Trained models and generated artifacts
+*.pth
+*.pt
+*.keras
+*.h5
+*.onnx
+
+# Local secrets
+.env
+.env.*
+!.env.example
