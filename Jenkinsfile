@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -34,6 +35,41 @@ pipeline {
             }
         }
 
+        stage('Start Selenium Browser') {
+            steps {
+                bat 'docker rm -f medvision-selenium-jenkins 2>NUL || exit /b 0'
+                bat 'docker run -d --name medvision-selenium-jenkins -p 4444:4444 --shm-size="2g" selenium/standalone-chrome:latest'
+
+                powershell '''
+                    $deadline = (Get-Date).AddMinutes(2)
+
+                    do {
+                        try {
+                            $response = Invoke-RestMethod `
+                                -Uri "http://localhost:4444/status" `
+                                -TimeoutSec 5
+
+                            if ($response.value.ready -eq $true) {
+                                Write-Host "Selenium Chrome is ready."
+                                exit 0
+                            }
+                        } catch {
+                            Write-Host "Waiting for Selenium Chrome..."
+                        }
+
+                        Start-Sleep -Seconds 3
+                    } while ((Get-Date) -lt $deadline)
+
+                    throw "Selenium Chrome did not become ready."
+                '''
+            }
+            post {
+                always {
+                    bat 'docker rm -f medvision-selenium-jenkins 2>NUL || exit /b 0'
+                }
+            }
+        }
+
         stage('Run Selenium UI Tests') {
             steps {
                 bat 'python -m pytest tests/selenium -v'
@@ -53,7 +89,7 @@ pipeline {
             }
             post {
                 always {
-                    bat 'docker rm -f medvision-ci-test'
+                    bat 'docker rm -f medvision-ci-test 2>NUL || exit /b 0'
                 }
             }
         }

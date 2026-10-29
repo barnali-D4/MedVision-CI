@@ -8,22 +8,20 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 @pytest.fixture
 def browser():
-    options = webdriver.EdgeOptions()
-    options.add_argument("--headless")
+    options = webdriver.ChromeOptions()
     options.add_argument("--window-size=1280,900")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--disable-background-mode")
-    options.add_argument("--no-first-run")
-    options.add_argument("--no-default-browser-check")
 
-    driver = webdriver.Edge(options=options)
+    driver = webdriver.Remote(
+        command_executor="http://localhost:4444",
+        options=options,
+    )
+
     yield driver
     driver.quit()
 
 
 def test_homepage_opens_in_browser(browser):
-    browser.get("http://127.0.0.1:5000/")
+    browser.get("http://host.docker.internal:5000/")
 
     assert browser.title == "MedVision-CI | Chest X-Ray Analysis"
     assert "MedVision-CI" in browser.find_element(
@@ -33,7 +31,7 @@ def test_homepage_opens_in_browser(browser):
 
 
 def test_valid_image_upload(browser, tmp_path):
-    browser.get("http://127.0.0.1:5000/")
+    browser.get("http://host.docker.internal:5000/")
 
     image_path = tmp_path / "test.png"
     Image.new("RGB", (64, 64), color="white").save(image_path)
