@@ -34,6 +34,12 @@ pipeline {
             }
         }
 
+        stage('Run Selenium UI Tests') {
+            steps {
+                bat 'python -m pytest tests/selenium -v'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 bat 'docker build -t medvision-ci:jenkins .'
