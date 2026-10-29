@@ -9,8 +9,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 @pytest.fixture
 def browser():
     options = webdriver.EdgeOptions()
-    options.add_argument("--headless=new")
+    options.add_argument("--headless")
     options.add_argument("--window-size=1280,900")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-background-mode")
+    options.add_argument("--no-first-run")
+    options.add_argument("--no-default-browser-check")
 
     driver = webdriver.Edge(options=options)
     yield driver
