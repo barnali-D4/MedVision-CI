@@ -33,11 +33,17 @@ pipeline {
                 bat 'python -m pytest tests/unit tests/api -v'
             }
         }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t medvision-ci:jenkins .'
+            }
+        }
     }
 
     post {
         success {
-            echo 'MedVision-CI: automated tests passed!'
+            echo 'MedVision-CI: automated tests and Docker build passed!'
         }
         failure {
             echo 'MedVision-CI: pipeline failed. Check the console output.'
