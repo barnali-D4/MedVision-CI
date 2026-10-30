@@ -8,7 +8,7 @@
 
 **Repository:** [MedVision-CI @ GitHub](https://github.com/barnali-D4/MedVision-CI)
 
-![Output](docs/images/MedVision-CI_webpage.png)
+![AI Pipeline](docs/images/MedVision-CI Chest X-Ray AI Pipeline.png)
 
 ---
 
@@ -213,7 +213,7 @@ Temporary containers are removed by the pipeline cleanup steps. The application 
 
 The Flask interface accepts a chest X-ray image and displays the predicted class, confidence score, and probabilities for NORMAL and PNEUMONIA.
 
-![MedVision-CI application output](docs/images/medvision-output.png)
+![Output](docs/images/MedVision-CI_webpage.png)
 
 *Figure 1. Example output from the running MedVision-CI application.*
 
