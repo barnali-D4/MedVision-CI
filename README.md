@@ -8,7 +8,7 @@
 
 **Repository:** [MedVision-CI @ GitHub](https://github.com/barnali-D4/MedVision-CI)
 
-![AI Pipeline](docs/images/MedVision-CI Chest X-Ray AI Pipeline.png)
+![AI Pipeline](docs/images/MedVision-CI_Chest_X-Ray_AI_Pipeline.png)
 
 ---
 
